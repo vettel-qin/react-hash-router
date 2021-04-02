@@ -1,2 +1,2 @@
-# react-hash-router
-hash路由实现原理
+# react-history-router
+browser路由实现原理
