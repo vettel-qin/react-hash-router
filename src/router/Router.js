@@ -1,36 +1,40 @@
-import { createContext, useEffect, useState } from "react"
+import React, { createContext, useEffect, useState} from 'react';
 
-// 用于共享路由当前history地址
+// 用于共享路由当前hash地址
 export const RouterContext = createContext();
 
-export default function Router(props) {
-  const [path, setPath] = useState();
+const Router = (props) => {
+  const [path, setPath] = useState('/');
 
   useEffect(() => {
-    // 先解析第一次的history值
-    const paths = window.location.pathname;
+    // 先解析第一次的hash值
+    getPath();
 
-    setPath(paths)
-
-    // 监听浏览器回退事件
-    window.addEventListener('popstate', () => {
-      const paths = window.location.pathname;
-      setPath(paths);
-    })
-
-    return () => {
-      window.removeEventListener('popstate');
+    //监听之后hash值的变化,进入路由和返回
+    window.onhashchange = (ev) => {
+      getPath();
     }
-    
-  }, [])
+  }, []);
 
-  const onPath = (paths) => () => {
-    setPath(paths);
-  }
+  // 解析hash地址
+  const getPath = () => {
+    let paths = window.location.hash;
+
+    if (paths) {
+      paths = paths.replace('#', '');
+    } else {
+      paths = '/';
+    }
+    setPath(paths)
+  };
 
   return (
-    <RouterContext.Provider value={{path, onPath: (paths) => {console.log(paths, 'eee'); setPath(paths)}}}>
+    <RouterContext.Provider
+      value={{path}}
+    >
       {props.children}
     </RouterContext.Provider>
   )
 }
+
+export default Router;
